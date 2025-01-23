@@ -1,0 +1,31 @@
+name: Executar Script de Python
+
+# Defineix l'horari (3 execucions al dia)
+on:
+  schedule:
+    - cron: '0 9 * * *'   # Executa a les 9:00 AM UTC
+    - cron: '0 15 * * *'  # Executa a les 3:00 PM UTC
+    - cron: '0 21 * * *'  # Executa a les 9:00 PM UTC
+
+jobs:
+  executar_script:
+    runs-on: ubuntu-latest  # Utilitza un entorn Linux
+
+    steps:
+    - name: Clonar el repositori
+      uses: actions/checkout@v3  # Clona el codi del repositori
+
+    - name: Configurar Python
+      uses: actions/setup-python@v4  # Configura l'entorn Python
+      with:
+        python-version: '3.9'  # Especifica la versió de Python
+
+    - name: Instal·lar les dependències
+      run: |
+        pip install -r requirements.txt  # Si tens un fitxer de dependències
+        # Si no tens requirements.txt, pots afegir manualment les teves llibreries:
+        # pip install beautifulsoup4 requests
+
+    - name: Executar el script
+      run: |
+        python script.py  # Executa el teu script
