@@ -29,6 +29,10 @@ jobs:
         # Si no tens requirements.txt, pots afegir manualment les teves llibreries:
         # pip install beautifulsoup4 requests
 
+    - name: Instal·lar playwright
+      run: |
+        playwright install
+        
     - name: Executar el script
       run: |
         python scrap_playwright.py  # Executa el teu script
