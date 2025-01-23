@@ -5,6 +5,7 @@ on:
   schedule:
     - cron: '0 9 * * *'   # Executa a les 9:00 AM UTC
     - cron: '0 12 * * *'  # Executa a les 12:00 PM UTC
+    - cron: '45 11 * * *'  # Executa a les 11:45 UTC
     - cron: '0 16 * * *'  # Executa a les 4:00 PM UTC
     - cron: '0 18 * * *'  # Executa a les 6:00 PM UTC
     - cron: '0 21 * * *'  # Executa a les 9:00 PM UTC
