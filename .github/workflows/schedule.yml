@@ -30,4 +30,4 @@ jobs:
 
     - name: Executar el script
       run: |
-        python script.py  # Executa el teu script
+        python scrap_playwright.py  # Executa el teu script
