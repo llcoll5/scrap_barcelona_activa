@@ -1,1 +1,6 @@
+google-auth==2.38.0
+google-auth-oauthlib==1.2.1
+gspread==6.1.4
+pandas==2.2.3
 playwright==1.49.1
+python-dotenv==1.0.1
