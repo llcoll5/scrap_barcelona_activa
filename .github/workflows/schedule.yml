@@ -1,44 +1,37 @@
 name: Executar Script de Python
 
-# Defineix l'horari (3 execucions al dia)
 on:
   schedule:
-    - cron: '0 9 * * *'   # Executa a les 8:00 AM UTC+1
-    - cron: '0 11 * * *'  # Executa a les 10:00 PM UTC+1
-    - cron: '0 13 * * *'  # Executa a les 12:00 PM UTC+1
-    - cron: '0 15 * * *'  # Executa a les 2:00 PM UTC+1
-    - cron: '0 17 * * *'  # Executa a les 4:00 PM UTC+1
-    - cron: '0 19 * * *'  # Executa a les 6:00 PM UTC+1
+    - cron: '0 9,11,13,15,17,19 * * *'  # Executa a les 9, 11, 13, 15, 17 i 19 UTC
 
 jobs:
   executar_script:
-    runs-on: ubuntu-latest  # Utilitza un entorn Linux
+    runs-on: ubuntu-latest
 
     steps:
     - name: Clonar el repositori
-      uses: actions/checkout@v3  # Clona el codi del repositori
+      uses: actions/checkout@v3  # Acció per clonar el repositori
 
     - name: Configurar Python
-      uses: actions/setup-python@v4  # Configura l'entorn Python
+      uses: actions/setup-python@v4  # Acció per configurar Python
       with:
         python-version: '3.9'  # Especifica la versió de Python
 
     - name: Instal·lar les dependències
       run: |
-        pip install -r requirements.txt  # Si tens un fitxer de dependències
-        # Si no tens requirements.txt, pots afegir manualment les teves llibreries:
-        # pip install beautifulsoup4 requests
+        pip install -r requirements.txt
 
-    - name: Instal·lar playwright
+    - name: Instal·lar Playwright i els navegadors
       run: |
+        playwright install-deps
         playwright install
-        
+
     - name: Executar el script
-    env:
-      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}  
-      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}  
-      EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}  
-      EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}  
-      WORKSHEET_KEY: ${{ secrets.WORKSHEET_KEY }}  
+      env:
+        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+        EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+        WORKSHEET_KEY: ${{ secrets.WORKSHEET_KEY }}
       run: |
-        python scrap_playwright.py  # Executa el teu script
+        python scrap_playwright.py
