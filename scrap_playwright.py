@@ -22,7 +22,8 @@ KEYWORDS = [
     "producci[óo]",
     "editor",
     "m[uo]ntador",
-    "cam[ea]r[òo]graf"
+    "cam[ea]r[òo]graf",
+    "bibliotec"
 ]
 KEYWORDS_PATTERNS = "(" + ")|(".join(KEYWORDS) + ")"
 
