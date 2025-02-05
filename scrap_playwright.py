@@ -118,7 +118,7 @@ class BarcelonaActiva(JobScraper):
 class CIDO_DIBA(JobScraper):
     def __init__(self):
         super().__init__()
-        self.URL_BASE = "https://cido.diba.cat/oposicions?filtreParaulaClau%5Bkeyword%5D=KEYWORD&ordenacio=DATAPUBLICACIO&ordre=DESC&showAs=GRID&filtreProximitat%5Bpoblacio%5D=&filtreProximitat%5Bkm%5D=&filtreProximitat%5Blatitud%5D=&filtreProximitat%5Blongitud%5D=&filtreDataPublicacio%5Bde%5D=&filtreDataPublicacio%5BfinsA%5D=&filtreEstat%5BterminiObert%5D=1&filtreSeleccioTitulacio%5BtitulacioRequerida%5D%5Bkeyword%5D=&opcions-menu=&_token=Z8ljM6QCnPh-LB71yn1cFwfsBugo1fFuInHtUrcYFbM"
+        self.URL_BASE = "https://cido.diba.cat/oposicions?filtreParaulaClau%5Bkeyword%5D=KEYWORD&ordenacio=DATAPUBLICACIO&ordre=DESC&showAs=GRID&filtreProximitat%5Bpoblacio%5D=&filtreProximitat%5Bkm%5D=&filtreProximitat%5Blatitud%5D=&filtreProximitat%5Blongitud%5D=&filtreDataPublicacio%5Bde%5D=&filtreDataPublicacio%5BfinsA%5D=&filtreEstat%5BterminiObert%5D=1&filtreSeleccioTitulacio%5BtitulacioRequerida%5D%5Bkeyword%5D=&opcions-menu="
         self.KEYWORDS = [
             "video",
             "audiovisual",
