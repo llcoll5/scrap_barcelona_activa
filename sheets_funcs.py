@@ -6,7 +6,7 @@ import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
 
-load_dotenv()
+load_dotenv(override=True)
 
 def get_credentials():
     google_credentials_json = os.getenv("GOOGLE_CREDENTIALS")
@@ -15,15 +15,19 @@ def get_credentials():
     credentials = Credentials.from_service_account_info(credentials_info, scopes=SCOPES)
     return gspread.authorize(credentials)
 
-def get_worksheet(key, sheet_num=0):
+def get_worksheet(key, sheet_num=0, sheet_name=None):
     gc = get_credentials()
     sh = gc.open_by_key(key)
-    return sh.get_worksheet(sheet_num)
+    if not sheet_name:
+        return sh.get_worksheet(sheet_num)
+    else:
+        return sh.worksheet(sheet_name)
 
 def get_sheet_as_df(worksheet):
     return pd.DataFrame(worksheet.get_all_records())
 
 def update_sheets(worksheet, dataframe):
+    dataframe.fillna("", inplace=True)
     worksheet.update([dataframe.columns.values.tolist()] + dataframe.values.tolist())
 
 def check_if_job_exists(dataframe, job, column="link"):
@@ -32,14 +36,9 @@ def check_if_job_exists(dataframe, job, column="link"):
 def get_column_length(dataframe, column="link"):
     return len(dataframe.values.tolist())
 
-
-_worksheet_key = "1jr4S3x7-8rHpTiFV0L9EtaYAqwg0n-2evUsoCiR6Jhg"
-_worksheet = get_worksheet(_worksheet_key)
-
-
 if __name__ == "__main__":
     
-    dataframe = get_sheet_as_df(_worksheet)
+    dataframe = get_sheet_as_df(os.getenv("WORKSHEET_KEY"))
 
 
     print(dataframe)
@@ -51,6 +50,3 @@ if __name__ == "__main__":
     dataframe.iloc[len(dataframe.values.tolist())] = ["testing", "link_Test"]
 
     print(f"checking if exists 'ee': {check_if_job_exists(dataframe, 'efe')}")
-
-
-    update_sheets(_worksheet, dataframe)
