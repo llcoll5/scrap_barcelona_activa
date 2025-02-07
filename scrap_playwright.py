@@ -148,12 +148,12 @@ class CIDO_DIBA(JobScraper):
             lloc = oferta.query_selector(".panel-heading").query_selector("p").inner_text()
             titol = oferta.query_selector("a").inner_text()
             link = self.transformar_link(oferta.query_selector("a").get_attribute("href"))
-            if self.check_key_words(titol):
-                dades.append({
-                    "titol": titol,
-                    "link": link,
-                    "lloc": lloc
-                })
+            # if self.check_key_words(titol):
+            dades.append({
+                "titol": titol,
+                "link": link,
+                "lloc": lloc
+            })
         return dades
     
     def transformar_link(self, link):
