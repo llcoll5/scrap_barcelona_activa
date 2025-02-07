@@ -70,7 +70,7 @@ class JobScraper:
 
     def send_new_jobs(self):
         message = f"Hola Ivet!<br>Han publicat <b>{len(self.feines_noves)} noves ofertes de feina</b> a {self.job_scraper_name}. Aquí sota les tens:<ul>"
-        message = self.get_jobs_list()
+        message = message + self.get_jobs_list()
         message = message + "</ul>Molta sort en la cerca!<br> <b>T'estim molt <3</b>"
         subject = f"Nova oferta a {self.job_scraper_name}!"
         sender.send_email(subject, message)
