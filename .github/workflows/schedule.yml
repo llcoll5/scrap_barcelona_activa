@@ -2,7 +2,7 @@ name: Executar Script de Python
 
 on:
   schedule:
-    - cron: '0 8,10,12,14,16,18 * * *'  # Executa a les 9, 11, 13, 15, 17 i 19 UTC+1
+    - cron: '0 8,10,12,14,16,18 * * 1-5'  # Executa a les 9, 11, 13, 15, 17 i 19 UTC+1
 
 jobs:
   executar_script:
