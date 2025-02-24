@@ -23,7 +23,9 @@ class JobScraper:
             pagina = navegador.new_page()
             pagina.goto(url)
             try:
-                pagina.wait_for_selector(self.wait_selector)
+                # pagina.wait_for_selector(self.wait_selector)
+                locator = pagina.locator(self.wait_selector)
+                locator.wait_for()
             except Exception as e:
                 print(e)
             
