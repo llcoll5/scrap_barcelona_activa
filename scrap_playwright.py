@@ -234,12 +234,11 @@ class TV3(JobScraper):
 
 
 if __name__ == "__main__":
-    #test
-    # js = BarcelonaActiva()
-    # js.get_jobs()
+    js = BarcelonaActiva()
+    js.get_jobs()
 
-    # cido = CIDO_DIBA()
-    # cido.get_jobs()
+    cido = CIDO_DIBA()
+    cido.get_jobs()
 
     tv3 = TV3()
     tv3.get_jobs()
