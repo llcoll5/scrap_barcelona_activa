@@ -106,7 +106,7 @@ class BarcelonaActiva(JobScraper):
     
     def get_jobs(self):
         for sector in self.SECTORS:
-            print(f"Scraping {self.URL_BASE.replace('SECTOR', sector)}...")
+            print(f"Scraping {self.URL_BASE.replace('SECTOR', sector)} ...")
             jobs = self.obtenir_dades_sectors(self.URL_BASE.replace("SECTOR", sector))
             new_jobs = self.get_new_jobs(jobs)
             print(f"Hem trobat {len(jobs)} feines, de les quals {len(new_jobs)} són noves.")
