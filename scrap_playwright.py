@@ -25,7 +25,7 @@ class JobScraper:
             try:
                 # self.pagina.wait_for_selector(self.wait_selector)
                 locator = self.pagina.locator(self.wait_selector)
-                locator.wait_for()
+                locator.last.wait_for()
             except Exception as e:
                 print(e)
             
