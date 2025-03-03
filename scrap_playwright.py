@@ -216,7 +216,7 @@ class TV3(JobScraper):
         return dades
 
     def get_jobs(self):
-        print(f"Scraping {self.URL_BASE}...")
+        print(f"Scraping {self.URL_BASE} ...")
         jobs = self.obtenir_dades_sectors(self.URL_BASE)
         new_jobs = self.get_new_jobs(jobs)
         print(f"Hem trobat {len(jobs)} feines, de les quals {len(new_jobs)} són noves.")
