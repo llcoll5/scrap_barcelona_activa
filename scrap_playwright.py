@@ -7,6 +7,8 @@ from playwright.sync_api import sync_playwright
 import sender
 import sheets_funcs
 
+import scrap_api
+
 class JobScraper:
     def __init__(self):
         self.KEYWORDS_PATTERNS = ''
@@ -38,11 +40,11 @@ class JobScraper:
         dades = []
         for oferta in ofertes:
             titol = oferta.inner_text()
-            link = oferta.get_attribute("href")
+            url = oferta.get_attribute("href")
             if self.check_key_words(titol):
                 dades.append({
                     "titol": titol,
-                    "link": link
+                    "url": url
                 })
         return dades
         
@@ -53,7 +55,7 @@ class JobScraper:
         self.df = sheets_funcs.get_sheet_as_df(self.worksheet)
         new_jobs = []
         for job in jobs:
-            if sheets_funcs.check_if_job_exists(self.df, job["link"]):
+            if sheets_funcs.check_if_job_exists(self.df, job["url"]):
                 new_jobs.append(job)
         return new_jobs
 
@@ -67,7 +69,7 @@ class JobScraper:
     def get_jobs_list(self):
         message = ""
         for job in self.feines_noves:
-            message = message + f"<li><a href='{job['link']}'>{job['titol']}</a></li>"
+            message = message + f"<li><a href='{job['url']}'>{job['titol']}</a></li>"
         return message
 
     def send_new_jobs(self):
@@ -81,17 +83,7 @@ class JobScraper:
 class BarcelonaActiva(JobScraper):
     def __init__(self):
         super().__init__()
-        self.URL_BASE = "https://treball.barcelonactiva.cat/porta22/cat/assetsocupacio/ofertesfeina/sectors.jsp?sector=SECTOR&idioma=cat"
-        self.SECTORS = [
-            "40271",
-            "83689",
-            "40279",
-            "106360",
-            "83686",
-            "83688",
-            "40272",
-            "120662"
-        ]
+        self.URL_BASE = "https://api.talentclue.com/jswidget-ajax/jswidget/jobs/e95d473e3656ff3751a99ec859c42454"
         self.KEYWORDS = [
             "v[íi]deo",
             "audiovisual",
@@ -105,14 +97,18 @@ class BarcelonaActiva(JobScraper):
         self.worksheet = sheets_funcs.get_worksheet(os.getenv("WORKSHEET_KEY"), sheet_name="BarcelonaActiva") 
     
     def get_jobs(self):
-        for sector in self.SECTORS:
-            print(f"Scraping {self.URL_BASE.replace('SECTOR', sector)} ...")
-            jobs = self.obtenir_dades_sectors(self.URL_BASE.replace("SECTOR", sector))
-            new_jobs = self.get_new_jobs(jobs)
-            print(f"Hem trobat {len(jobs)} feines, de les quals {len(new_jobs)} són noves.")
-            self.update_new_jobs(new_jobs)
-            self.feines = self.feines + jobs
-            self.feines_noves = self.feines_noves + new_jobs
+        print(f"Scraping {self.job_scraper_name} ...")
+        feines = scrap_api.get_jobs_from_api(self.URL_BASE)
+        self.feines = []
+        for job in feines:
+            if self.check_key_words(job["title"]):
+                self.feines.append({
+                    "titol": job["title"],
+                    "url": job["url"]
+                })
+        self.feines_noves = self.get_new_jobs(self.feines)
+        print(f"Hem trobat {len(self.feines)} feines, de les quals {len(self.feines_noves)} són noves.")
+        self.update_new_jobs(self.feines_noves)
         print(f"feines noves: {self.feines_noves}")
         print(f"feines antigues: {[feina for feina in self.feines if feina not in self.feines_noves]}")
         if len(self.feines_noves) > 0:
@@ -142,7 +138,7 @@ class CIDO_DIBA(JobScraper):
     def get_jobs_list(self):
         message = ""
         for job in self.feines_noves:
-            message = message + f"<li><a href='{job['link']}'>{job['titol']}</a> - {job['lloc']}</li>"
+            message = message + f"<li><a href='{job['url']}'>{job['titol']}</a> - {job['lloc']}</li>"
         return message
 
     def extreure_dades_ofertes(self, ofertes):
@@ -150,17 +146,17 @@ class CIDO_DIBA(JobScraper):
         for oferta in ofertes:
             lloc = oferta.query_selector(".panel-heading").query_selector("p").inner_text()
             titol = oferta.query_selector("a").inner_text()
-            link = self.transformar_link(oferta.query_selector("a").get_attribute("href"))
+            url = self.transformar_url(oferta.query_selector("a").get_attribute("href"))
             if self.check_key_words(titol):
                 dades.append({
                     "titol": titol,
-                    "link": link,
+                    "url": url,
                     "lloc": lloc
                 })
         return dades
     
-    def transformar_link(self, link):
-        return self.URL_PATH + link
+    def transformar_url(self, url):
+        return self.URL_PATH + url
     
     def get_jobs(self):
         self.feines = []
@@ -206,12 +202,12 @@ class TV3(JobScraper):
             titol = oferta.inner_text()
             oferta_locator = self.pagina.locator(f"text={titol}")  
             
-            link_element = oferta_locator.locator("xpath=ancestor::a").first
-            link = self.transformar_link(link_element.get_attribute("href"))
+            url_element = oferta_locator.locator("xpath=ancestor::a").first
+            url = self.transformar_url(url_element.get_attribute("href"))
             if self.check_key_words(titol):
                 dades.append({
                     "titol": titol,
-                    "link": link
+                    "url": url
                 })
         return dades
 
@@ -228,8 +224,8 @@ class TV3(JobScraper):
         if len(self.feines_noves) > 0:
             self.send_new_jobs()
 
-    def transformar_link(self, link):
-        return self.URL_PATH + link
+    def transformar_url(self, url):
+        return self.URL_PATH + url
 
 
 

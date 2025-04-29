@@ -30,10 +30,10 @@ def update_sheets(worksheet, dataframe):
     dataframe.fillna("", inplace=True)
     worksheet.update([dataframe.columns.values.tolist()] + dataframe.values.tolist())
 
-def check_if_job_exists(dataframe, job, column="link"):
+def check_if_job_exists(dataframe, job, column="url"):
     return job not in set(dataframe[column])
 
-def get_column_length(dataframe, column="link"):
+def get_column_length(dataframe, column="url"):
     return len(dataframe.values.tolist())
 
 if __name__ == "__main__":
@@ -47,6 +47,6 @@ if __name__ == "__main__":
 
     print(f"length values: {len(dataframe.values.tolist())}")
 
-    dataframe.iloc[len(dataframe.values.tolist())] = ["testing", "link_Test"]
+    dataframe.iloc[len(dataframe.values.tolist())] = ["testing", "url_Test"]
 
     print(f"checking if exists 'ee': {check_if_job_exists(dataframe, 'efe')}")

@@ -34,4 +34,4 @@ jobs:
         EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
         WORKSHEET_KEY: ${{ secrets.WORKSHEET_KEY }}
       run: |
-        python scrap_playwright.py
+        python scrap_api.py
