@@ -9,6 +9,8 @@ import sheets_funcs
 
 import scrap_api
 
+#New Version 
+
 class JobScraper:
     def __init__(self):
         self.KEYWORDS_PATTERNS = ''
