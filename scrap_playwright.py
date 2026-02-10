@@ -1,8 +1,10 @@
 import os
 import re
 import time
+import requests
 
 from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 
 import sender
 import sheets_funcs
@@ -197,15 +199,22 @@ class TV3(JobScraper):
 
         self.URL_PATH="https://seleccio.ccma.cat/"
 
+    def obtenir_dades_sectors(self):
+        web = requests.get(self.URL_BASE)
+        if web.status_code != 200:
+            print(f"Error al accedir a {self.URL_BASE}: {web.status_code}")
+            return []
+        soup = BeautifulSoup(web.content, 'html.parser')
+        feines = soup.select(self.query_selector)
+        feines = [feina.parent for feina in feines]
+        feines_finals = self.extreure_dades_ofertes(feines)
+        return feines_finals
 
     def extreure_dades_ofertes(self, ofertes):
         dades = []
         for oferta in ofertes:
-            titol = oferta.inner_text()
-            oferta_locator = self.pagina.locator(f"text={titol}")  
-            
-            url_element = oferta_locator.locator("xpath=ancestor::a").first
-            url = self.transformar_url(url_element.get_attribute("href"))
+            titol = oferta.text.strip()
+            url = self.transformar_url(oferta["href"])
             if self.check_key_words(titol):
                 dades.append({
                     "titol": titol,
@@ -215,7 +224,7 @@ class TV3(JobScraper):
 
     def get_jobs(self):
         print(f"Scraping {self.URL_BASE} ...")
-        jobs = self.obtenir_dades_sectors(self.URL_BASE)
+        jobs = self.obtenir_dades_sectors()
         new_jobs = self.get_new_jobs(jobs)
         print(f"Hem trobat {len(jobs)} feines, de les quals {len(new_jobs)} són noves.")
         self.update_new_jobs(new_jobs)
@@ -228,6 +237,7 @@ class TV3(JobScraper):
 
     def transformar_url(self, url):
         return self.URL_PATH + url
+    
 
 
 
@@ -235,8 +245,8 @@ if __name__ == "__main__":
     js = BarcelonaActiva()
     js.get_jobs()
 
-    # cido = CIDO_DIBA()
-    # cido.get_jobs()
+    cido = CIDO_DIBA()
+    cido.get_jobs()
 
     tv3 = TV3()
     tv3.get_jobs()
