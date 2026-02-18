@@ -190,7 +190,8 @@ class TV3(JobScraper):
             "m[uo]ntador",
             "c[àa]m[ea]ra",
             "cam[ea]r[òo]graf",
-            "documenta"
+            "documenta",
+            ".*"
         ]
         self.KEYWORDS_PATTERNS = "(" + ")|(".join(self.KEYWORDS) + ")"  
         self.worksheet = sheets_funcs.get_worksheet(os.getenv("WORKSHEET_KEY"), sheet_name=self.job_scraper_name) 
@@ -338,3 +339,4 @@ if __name__ == "__main__":
 
     mediapro = Mediapro()
     mediapro.get_jobs()
+
