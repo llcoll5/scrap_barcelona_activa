@@ -238,6 +238,91 @@ class TV3(JobScraper):
     def transformar_url(self, url):
         return self.URL_PATH + url
     
+class Mediapro(TV3):
+    def __init__(self):
+        super().__init__()
+        self.URL_BASE = "https://jobs.mediapro.tv/empleos/go/empleos/8725802/"
+        self.KEYWORDS = [
+            "v[íi]deo",
+            "audiovisual",
+            "producci[óo]",
+            "editor",
+            "m[uo]ntador",
+            "c[àa]m[ea]ra",
+            "cam[ea]r[òo]graf",
+            "documenta",
+            ".*"
+        ]
+        self.KEYWORDS_PATTERNS = "(" + ")|(".join(self.KEYWORDS) + ")"  
+        self.worksheet = sheets_funcs.get_worksheet(os.getenv("WORKSHEET_KEY"), sheet_name=self.job_scraper_name) 
+        self.wait_selector = 'h3'
+        self.query_selector = '.jobTitle-link'
+
+        self.URL_PATH="https://jobs.mediapro.tv"
+
+    def obtenir_dades_sectors(self):
+        web = requests.get(self.URL_BASE, verify=False)
+        if web.status_code != 200:
+            print(f"Error al accedir a {self.URL_BASE}: {web.status_code}")
+            return []
+        soup = BeautifulSoup(web.content, 'html.parser')
+        feines = soup.select(self.query_selector)
+        print(f"feines: {feines}")
+        feines = [feina.parent for feina in feines]
+        feines_finals = self.extreure_dades_ofertes(feines)
+        return feines_finals
+    
+    def deduplication(self, jobs):
+        seen = set()
+        unique_jobs = []
+        for job in jobs:
+            identifier = job["url"]
+            if identifier not in seen:
+                seen.add(identifier)
+                unique_jobs.append(job)
+        return unique_jobs
+
+    def extreure_dades_ofertes(self, ofertes):
+        dades = []
+        for oferta in ofertes:
+            titol = oferta.text.strip()
+            url = self.transformar_url(oferta.a["href"])
+            if self.check_key_words(titol):
+                dades.append({
+                    "titol": titol,
+                    "url": url,
+                    "lloc": self.get_location({"url": url})
+                })
+        return dades
+    
+    def get_location(self, job):
+        web = requests.get(job["url"], verify=False)
+        if web.status_code != 200:
+            print(f"Error al accedir a {job['url']}: {web.status_code}")
+            return ""
+        soup = BeautifulSoup(web.content, 'html.parser')
+        location_element = soup.select_one(".jobGeoLocation")
+        if location_element:
+            return location_element.text.strip()
+        return ""
+
+    def get_jobs(self):
+        print(f"Scraping {self.URL_BASE} ...")
+        jobs = self.obtenir_dades_sectors()
+        jobs = self.deduplication(jobs)
+        new_jobs = self.get_new_jobs(jobs)
+        print(f"Hem trobat {len(jobs)} feines, de les quals {len(new_jobs)} són noves.")
+        self.update_new_jobs(new_jobs)
+        self.feines = self.feines + jobs
+        self.feines_noves = self.feines_noves + new_jobs
+        print(f"feines noves: {self.feines_noves}")
+        print(f"feines antigues: {[feina for feina in self.feines if feina not in self.feines_noves]}")
+        if len(self.feines_noves) > 0:
+            self.send_new_jobs()
+
+    def transformar_url(self, url):
+        return self.URL_PATH + url
+
 
 
 
@@ -251,3 +336,5 @@ if __name__ == "__main__":
     tv3 = TV3()
     tv3.get_jobs()
 
+    mediapro = Mediapro()
+    mediapro.get_jobs()
