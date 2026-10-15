@@ -77,9 +77,9 @@ class JobScraper:
         return message
 
     def send_new_jobs(self):
-        message = f"Hola Ivet!<br>Han publicat <b>{len(self.feines_noves)} noves ofertes de feina</b> a {self.job_scraper_name}. Aquí sota les tens:<ul>"
+        message = f"Hola Irene!<br>Han publicat <b>{len(self.feines_noves)} noves ofertes de feina</b> a {self.job_scraper_name}. Aquí sota les tens:<ul>"
         message = message + self.get_jobs_list()
-        message = message + "</ul>Molta sort en la cerca!<br> <b>T'estim molt <3</b>"
+        message = message + "</ul>Molta sort en la cerca!<br>"
         subject = f"Nova oferta a {self.job_scraper_name}!"
         sender.send_email(subject, message)
 
@@ -87,15 +87,15 @@ class JobScraper:
 class BarcelonaActiva(JobScraper):
     def __init__(self):
         super().__init__()
-        self.URL_BASE = "https://api.talentclue.com/jswidget-ajax/jswidget/jobs/e95d473e3656ff3751a99ec859c42454"
+        self.URL_BASE = "https://api.talentclue.com/careersite-api/jswidget/default/jobs/eyJsYW5nIjoiY2EifQ==?jobsoutput=array"
         self.KEYWORDS = [
-            "v[íi]deo",
-            "audiovisual",
-            "producci[óo]",
-            "editor",
-            "m[uo]ntador",
-            "c[àa]m[ea]ra",
-            "cam[ea]r[òo]graf"
+            "gesti[óo] cultural",
+            "cultural",
+            "comunicaci[óo]",
+            "comunicador[/a]*",
+            "gestor[/a]* cultural",
+            "gestor[/a]* de projectes culturals",
+            "projectes culturals"
         ]
         self.KEYWORDS_PATTERNS = "(" + ")|(".join(self.KEYWORDS) + ")"    
         self.worksheet = sheets_funcs.get_worksheet(os.getenv("WORKSHEET_KEY"), sheet_name="BarcelonaActiva") 
@@ -121,16 +121,16 @@ class BarcelonaActiva(JobScraper):
 class CIDO_DIBA(JobScraper):
     def __init__(self):
         super().__init__()
-        self.URL_BASE = "https://cido.diba.cat/oposicions?filtreParaulaClau%5Bkeyword%5D=KEYWORD&ordenacio=DATAPUBLICACIO&ordre=DESC&showAs=GRID&filtreProximitat%5Bpoblacio%5D=&filtreProximitat%5Bkm%5D=&filtreProximitat%5Blatitud%5D=&filtreProximitat%5Blongitud%5D=&filtreDataPublicacio%5Bde%5D=&filtreDataPublicacio%5BfinsA%5D=&filtreEstat%5BterminiObert%5D=1&filtreSeleccioTitulacio%5BtitulacioRequerida%5D%5Bkeyword%5D=&opcions-menu=&_token=Z8ljM6QCnPh-LB71yn1cFwfsBugo1fFuInHtUrcYFbM"
+        self.URL_BASE = "https://cido.diba.cat/oposicions?filtreParaulaClau%5Bkeyword%5D=KEYWORD&ordenacio=DATAPUBLICACIO&ordre=DESC&showAs=GRID&filtreProximitat%5Bpoblacio%5D=&filtreProximitat%5Bkm%5D=&filtreProximitat%5Blatitud%5D=&filtreProximitat%5Blongitud%5D=&filtreDataPublicacio%5Bde%5D=&filtreDataPublicacio%5BfinsA%5D=&filtreInstitucio%5Boptions%5D%5B%5D=8019&filtreInstitucio%5Boptions%5D%5B%5D=8121&filtreInstitucio%5Boptions%5D%5B%5D=9&filtreInstitucio%5Boptions%5D%5B%5D=-8019000&filtreEstat%5BterminiObert%5D=1&filtreSeleccioTitulacio%5BtitulacioRequerida%5D%5Bkeyword%5D=&opcions-menu=barcelona&_token=WunxoWuxrNDNPcO8In2QuL7H9FgZ_nT98KkeoKGuKlM&opcions-menu=&filtreInstitucio%5Boptions%5D%5B%5D=9&filtreInstitucio%5Boptions%5D%5B%5D=20&filtreInstitucio%5Boptions%5D%5B%5D=-24&filtreInstitucio%5Boptions%5D%5B%5D=-8019000"
         self.KEYWORDS = [
-            "video",
-            "audiovisual",
-            "produccio",
-            "editor",
-            "muntador",
-            "montador",
-            "camera",
-            "camerograf"
+            "gestio+cultural",
+            "cultural",
+            "comunicacio",
+            "comunicador",
+            "gestor+cultural",
+            "gestor+de+projectes+culturals",
+            "projectes+culturals",
+            "projectes+de+cultura"
         ]
         self.KEYWORDS_PATTERNS = "(" + ")|(".join(self.KEYWORDS) + ")"  
         self.worksheet = sheets_funcs.get_worksheet(os.getenv("WORKSHEET_KEY"), sheet_name="CIDO-DIBA") 
@@ -239,91 +239,6 @@ class TV3(JobScraper):
     def transformar_url(self, url):
         return self.URL_PATH + url
     
-class Mediapro(TV3):
-    def __init__(self):
-        super().__init__()
-        self.URL_BASE = "https://jobs.mediapro.tv/empleos/go/empleos/8725802/"
-        self.KEYWORDS = [
-            "v[íi]deo",
-            "audiovisual",
-            "producci[óo]",
-            "editor",
-            "m[uo]ntador",
-            "c[àa]m[ea]ra",
-            "cam[ea]r[òo]graf",
-            "documenta",
-            ".*"
-        ]
-        self.KEYWORDS_PATTERNS = "(" + ")|(".join(self.KEYWORDS) + ")"  
-        self.worksheet = sheets_funcs.get_worksheet(os.getenv("WORKSHEET_KEY"), sheet_name=self.job_scraper_name) 
-        self.wait_selector = 'h3'
-        self.query_selector = '.jobTitle-link'
-
-        self.URL_PATH="https://jobs.mediapro.tv"
-
-    def obtenir_dades_sectors(self):
-        web = requests.get(self.URL_BASE, verify=False)
-        if web.status_code != 200:
-            print(f"Error al accedir a {self.URL_BASE}: {web.status_code}")
-            return []
-        soup = BeautifulSoup(web.content, 'html.parser')
-        feines = soup.select(self.query_selector)
-        print(f"feines: {feines}")
-        feines = [feina.parent for feina in feines]
-        feines_finals = self.extreure_dades_ofertes(feines)
-        return feines_finals
-    
-    def deduplication(self, jobs):
-        seen = set()
-        unique_jobs = []
-        for job in jobs:
-            identifier = job["url"]
-            if identifier not in seen:
-                seen.add(identifier)
-                unique_jobs.append(job)
-        return unique_jobs
-
-    def extreure_dades_ofertes(self, ofertes):
-        dades = []
-        for oferta in ofertes:
-            titol = oferta.text.strip()
-            url = self.transformar_url(oferta.a["href"])
-            if self.check_key_words(titol):
-                dades.append({
-                    "titol": titol,
-                    "url": url,
-                    "lloc": self.get_location({"url": url})
-                })
-        return dades
-    
-    def get_location(self, job):
-        web = requests.get(job["url"], verify=False)
-        if web.status_code != 200:
-            print(f"Error al accedir a {job['url']}: {web.status_code}")
-            return ""
-        soup = BeautifulSoup(web.content, 'html.parser')
-        location_element = soup.select_one(".jobGeoLocation")
-        if location_element:
-            return location_element.text.strip()
-        return ""
-
-    def get_jobs(self):
-        print(f"Scraping {self.URL_BASE} ...")
-        jobs = self.obtenir_dades_sectors()
-        jobs = self.deduplication(jobs)
-        new_jobs = self.get_new_jobs(jobs)
-        print(f"Hem trobat {len(jobs)} feines, de les quals {len(new_jobs)} són noves.")
-        self.update_new_jobs(new_jobs)
-        self.feines = self.feines + jobs
-        self.feines_noves = self.feines_noves + new_jobs
-        print(f"feines noves: {self.feines_noves}")
-        print(f"feines antigues: {[feina for feina in self.feines if feina not in self.feines_noves]}")
-        if len(self.feines_noves) > 0:
-            self.send_new_jobs()
-
-    def transformar_url(self, url):
-        return self.URL_PATH + url
-
 
 
 
@@ -331,12 +246,10 @@ if __name__ == "__main__":
     js = BarcelonaActiva()
     js.get_jobs()
 
-    # cido = CIDO_DIBA()
-    # cido.get_jobs()
+    cido = CIDO_DIBA()
+    cido.get_jobs()
 
     tv3 = TV3()
     tv3.get_jobs()
 
-    mediapro = Mediapro()
-    mediapro.get_jobs()
 
