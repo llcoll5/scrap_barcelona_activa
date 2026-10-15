@@ -247,7 +247,10 @@ if __name__ == "__main__":
     js.get_jobs()
 
     cido = CIDO_DIBA()
-    cido.get_jobs()
+    try:
+        cido.get_jobs()
+    except Exception as e:
+        print(f"Could not get CIDO jobs. Because of {e}")
 
     tv3 = TV3()
     tv3.get_jobs()
